@@ -85,7 +85,7 @@
     const clipOfObject = clone( object );
     rect.clipPath = clipOfObject;
     rect.clipPath.set({
-      inverted: true, 
+      inverted: true, // this magic
       left: ( rect.clipPath.width / 2 ) * -1,
       top: ( rect.clipPath.height / 2 ) * -1,
     });
@@ -95,7 +95,6 @@
     const clipFinal = new fabric.Group([rect]);
     clipFinal.clipPath = clipOfObjectFinal;
     clipFinal.clipPath.set({
-      typeName: 'ClipPath',
       left: ( rect.clipPath.width / 2 ) * -1,
       top: ( rect.clipPath.height / 2 ) * -1,
     });
