@@ -82,7 +82,7 @@
 
     // phase 2 - apply inverted mask 
     // create a clone of object and transform like a mask inverted
-    var clipOfObject = clone( object );
+    const clipOfObject = clone( object );
     rect.clipPath = clipOfObject;
     rect.clipPath.set({
       inverted: true, 
@@ -91,7 +91,7 @@
     });
   
     // phase 3 - apply another mask to maker inner shadow
-    var clipOfObjectFinal = clone( object );
+    const clipOfObjectFinal = clone( object );
     const clipFinal = new fabric.Group([rect]);
     clipFinal.clipPath = clipOfObjectFinal;
     clipFinal.clipPath.set({
