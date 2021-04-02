@@ -1,7 +1,7 @@
 # Fabric.js inner shadow
 
 ## Sample
-<img src="src/sample.gif">
+<img src="src/sample-full.gif">
 
 ## Fix issues
 #### Angle
