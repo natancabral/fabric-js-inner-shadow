@@ -1,10 +1,10 @@
 # Fabric.js inner shadow
 
-### sample
-<img src="src/sample1.gif">
+## Sample
+<img src="src/sample.gif">
 
-### fix
+## Fix issues
 #### Angle
 
-<img src="src/problem.gif">
+<img src="src/fixissues.gif">
 
