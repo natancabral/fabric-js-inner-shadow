@@ -1,0 +1,39 @@
+html,body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  padding: 0;
+  margin: 0;
+}
+#panel {
+  padding-left: 20px;
+}
+#panel h1 {
+  font-size: 30;
+  font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+}
+#panel button {
+  padding: 10px 15px;
+  margin: 0;
+  border: 1px solid #aaa;
+}
+#panel #createObjectInnerShadow {
+  background-color: blue;
+  color: white;
+}
+#outside {
+  position: relative;
+  width:100%;
+  height:100%;
+}
+#inside {
+  left:50%;
+  top:50%;
+  margin-left:-300px; 
+  margin-top:-200px; 
+  position:absolute;
+  width:600px; 
+  height:400px; 
+  background:#eeeeee;
+  border: 1px solid #aaaaaa;
+}
