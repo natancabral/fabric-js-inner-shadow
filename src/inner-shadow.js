@@ -92,6 +92,7 @@
       //delete values.angle;
       // reset values
       o.set({ scaleX: 1, scaleY: 1, flipX: false, flipY: false, });
+      c.renderAll();
       // return transform values
       return values;
     }
@@ -105,7 +106,6 @@
     // -----------------------------------------------------------------------------
 
     const { angle } = object;
-
     // -----------------------------------------------------------------------------
     // set angle 0
     setAngle( canvas, [object], angle, -1 );
@@ -123,8 +123,8 @@
       height: height + ( offset * 2 ),  // set margin/offset
       left: left - offset,
       top: top - offset,
-      // scaleX, scaleX,
-      // scaleY, scaleY,
+      scaleX: 1,
+      scaleY: 1,
       fill: "black",
       // set shadow
       shadow: {
@@ -134,6 +134,11 @@
         offsetY: 0,
       },
     });
+
+    console.log('transform>>', valuesTransform );
+    console.log('object>>', 'width', 'height', 'angle', 'left', 'top', 'scaleX', 'scaleY', 'zoomX', 'zoomY' );
+    console.log('object>>', object.width, object.height, object.angle, object.left, object.top, object.scaleX, object.scaleY, object.zoomX, object.zoomY );
+    console.log('rect>>', rect.width, rect.height, rect.angle, rect.left, rect.top, rect.scaleX, rect.scaleY, rect.zoomX, rect.zoomY );
 
     // phase 2 - apply inverted mask 
     // create a clone of object and transform like a mask inverted
@@ -154,14 +159,17 @@
       top: ( rect.clipPath.height / 2 ) * -1,
     });
 
+    console.log('clipFinal>>', clipFinal.width, clipFinal.height, clipFinal.angle, clipFinal.left, clipFinal.top, clipFinal.scaleX, clipFinal.scaleY, clipFinal.zoomX, clipFinal.zoomY );
+
     // add all on canvas
     canvas.add(clipFinal);
     canvas.bringToFront(clipFinal);
+    canvas.renderAll();
 
     // -----------------------------------------------------------------------------
     // set old transform
     setTransform( canvas, [object,clipFinal], valuesTransform );
-    // set old angle
+    // // set old angle
     setAngle( canvas, [object,clipFinal], angle, 1 );
     // -----------------------------------------------------------------------------
 
