@@ -17,8 +17,7 @@ html,body {
   margin: 0;
   border: 1px solid #aaa;
 }
-#panel #createObjectInnerShadow,
-#panel #createObjectInnerShadow2 {
+#panel button.btn-inner-shadow {
     background-color: blue;
   color: white;
 }
