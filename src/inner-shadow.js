@@ -35,13 +35,18 @@
       case "circle":
         canvas.on("object:scaled", (event) => {
 
-          newRadius = oldRadius * object.scaleX;
+          if(object.scaleX !== object.scaleY){
+            newRadius = oldRadius;
+          }else{
+            newRadius = oldRadius * ( object.scaleX < object.scaleY ? object.scaleX : object.scaleY );
+          }
           
           object.set({
             scaleX: 1,
             scaleY: 1,
             radius: parseFloat(newRadius.toFixed(2)),
           });
+
           canvas.off("object:scaled");
         });
 
@@ -58,6 +63,7 @@
             scaleX: 1,
             scaleY: 1,
           });
+
           canvas.off("object:scaled");
         });
 
