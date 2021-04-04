@@ -3,10 +3,10 @@
 * not finished yet 
 
 ## Sample
-<img src="src/sample-2.png">
+<img src="src/sample-1.png">
 
 ## Explanation
-<img src="src/explanation.png">
+<img src="src/show-me-the-code.png">
 
 ## Video
 <img src="src/sample-full.gif">
