@@ -5,7 +5,7 @@
 ## Sample
 <img src="src/sample-2.png">
 
-# Explanation
+## Explanation
 <img src="src/show-me-the-code.png">
 
 ## Video
