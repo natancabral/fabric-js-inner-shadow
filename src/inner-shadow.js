@@ -3,41 +3,131 @@
   const canvas = new fabric.Canvas('innershadow',{
     preserveObjectStacking: true
   });
-  canvas.on('after:render', () => {
-    // cria um retangulo de area do objeto
-    canvas.contextContainer.strokeStyle = '#444444';  
-    canvas.forEachObject( ( obj ) => {
-      const { left, top, width, height } = obj.getBoundingRect();
-      canvas.contextContainer.strokeRect(
-        left + 0.5,
-        top + 0.5,
-        width,
-        height
-      );
-    })
-  });
 
+  // canvas.on('after:render', () => {
+  //   // cria um retangulo de area do objeto
+  //   canvas.contextContainer.strokeStyle = '#444444';  
+  //   canvas.forEachObject( ( obj ) => {
+  //     const { left, top, width, height } = obj.getBoundingRect();
+  //     canvas.contextContainer.strokeRect(
+  //       left + 0.5,
+  //       top + 0.5,
+  //       width,
+  //       height
+  //     );
+  //   })
+  // });
+
+  const objectScaling = ( event ) => {
+
+    let object = event.target || canvas.getActiveObject();
+    if (object === undefined || object === null) return;
+
+    console.log(object.get('type'));
+
+    // old values
+    const { width:oldWidth, height:oldHeight, radius:oldRadius, rx:oldRx, ry:oldRy } = object;
+    // new values
+    let newWidth, newHeight, newRadius, newRx, newRy;
+
+    switch (object.get('type')) {
+
+      case "circle":
+        canvas.on("object:scaled", (event) => {
+
+          newRadius = oldRadius * object.scaleX;
+          
+          object.set({
+            scaleX: 1,
+            scaleY: 1,
+            radius: parseFloat(newRadius.toFixed(2)),
+          });
+          canvas.off("object:scaled");
+        });
+
+        break;
+      case "ellipse":
+        canvas.on("object:scaled", (event) => {
+
+          newRx = oldRx * object.scaleX;
+          newRy = oldRy * object.scaleY;
+
+          object.set({
+            rx: parseFloat(newRx.toFixed(2)),
+            ry: parseFloat(newRy.toFixed(2)),
+            scaleX: 1,
+            scaleY: 1,
+          });
+          canvas.off("object:scaled");
+        });
+
+        break;
+      case "rect":
+      case "line":
+        canvas.on("object:scaled", (event) => {
+
+          newWidth = oldWidth * object.scaleX;
+          newHeight = oldHeight * object.scaleY;
+          newRx = oldRx * object.scaleX;
+          newRy = oldRy * object.scaleY;
+          newRadius = ( newRy + newRx ) / 2 ;
+
+          object.set({
+            rx: parseFloat(newRadius.toFixed(2)),
+            ry: parseFloat(newRadius.toFixed(2)),
+            width: parseFloat(newWidth.toFixed(2)),
+            height: parseFloat(newHeight.toFixed(2)),
+            scaleX: 1,
+            scaleY: 1,
+          });
+
+          canvas.off("object:scaled");
+        });
+
+        break;
+    }
+
+    object.setCoords();
+    canvas.renderAll();
+  }
+
+  canvas.on("object:scaling", objectScaling );
 
   // clone efficient function
   const clone = (object) => {
+
     if (object === undefined || object === null || typeof object !== "object")
       return object
     else
     return Object.assign(Object.create(Object.getPrototypeOf(object)), object);
+
   }
 
   const addObjectRect = () => {
+
     const object = new fabric.Rect({ width: 300, height: 300, top: 10, left: 10, fill: 'yellow', });
     canvas.add( object );
     canvas.setActiveObject(object);
     canvas.renderAll();
+ 
   }
 
   const addObjectCircle = () => {
+
     const object = new fabric.Circle({ radius: 200, top: 10, left: 10, fill: 'yellow', });
     canvas.add( object );
     canvas.setActiveObject(object);
     canvas.renderAll();
+
+  }
+
+  const addObjectEllipse = () => {
+
+    const object = new fabric.Ellipse({ rx: 200, ry: 200, top: 10, left: 10, fill: 'yellow', });
+    canvas.add( object );
+    canvas.setActiveObject(object);
+    canvas.renderAll();
+
   }
 
   const addObjectPath = () => {
@@ -73,60 +163,39 @@
       return;
     }
 
-    // functions
-    // -----------------------------------------------------------------------------
-    const setAngle = ( c, elements, angle, multiplier ) => {
-      const group = new fabric.Group(elements);
-      group.rotate( angle === undefined ? 0 : angle * multiplier ); // 1|-1
-      group.destroy()
-      c.renderAll();
-    }
-    
-    const getTransform = ( c, o ) => {
-      // calculate the total transformation that is applied to the objects pixels:
-      const mCanvas   = c.viewportTransform;
-      const mObject   = o.calcTransformMatrix();
-      const mTotal    = fabric.util.multiplyTransformMatrices(mCanvas, mObject); // inverting the order gives wrong result
-      const options   = fabric.util.qrDecompose(mTotal);
-      const values    = {...options, flipX: o.flipX, flipY: o.flipY };
-      //delete values.angle;
-      // reset values
-      o.set({ scaleX: 1, scaleY: 1, flipX: false, flipY: false, });
-      c.renderAll();
-      // return transform values
-      return values;
+    const setAngle = ( elements, angle, multiplier ) => {
+      if( angle > 0 ){
+        const group = new fabric.Group(elements);
+        group.rotate( angle === undefined ? 0 : angle * multiplier ); // 1|-1
+        group.destroy()
+        canvas.renderAll();
+      }
     }
 
-    const setTransform = ( c, o, values ) => {
-      const group = new fabric.Group( o );
-      group.set( values );
-      group.destroy();
-      c.renderAll();
+    // step 1
+
+    const { angle, scaleX, scaleY } = object;
+    // set to angle = 0
+    setAngle( [object], angle, -1 );
+    // set to scale 1
+    if( scaleX != 1 || scaleY != 1 ){
+      offset = 0;        
+      object.set({
+        scaleX: 1,
+        scaleY: 1,
+      });
     }
-    // -----------------------------------------------------------------------------
 
-    const { angle } = object;
-    // -----------------------------------------------------------------------------
-    // set angle 0
-    setAngle( canvas, [object], angle, -1 );
-    // get transform and reset values
-    const valuesTransform = getTransform( canvas, object );    
-    // -----------------------------------------------------------------------------
+    // step 2
 
-    // phase 1
-    // get values of object , dimensions and position
     const { width, height, left, top } = object;
-    // create a rect object
     const rect = new fabric.Rect({
       typeName: 'Rect',
-      width: width + ( offset * 2 ), // set margin/offset
-      height: height + ( offset * 2 ),  // set margin/offset
+      width: width + ( offset * 2 ), 
+      height: height + ( offset * 2 ), 
       left: left - offset,
       top: top - offset,
-      scaleX: 1,
-      scaleY: 1,
       fill: "black",
-      // set shadow
       shadow: {
         color: "rgba(0,0,0,1)",
         blur: 10,
@@ -134,49 +203,58 @@
         offsetY: 0,
       },
     });
+    rect.setCoords();
 
-    console.log('transform>>', valuesTransform );
-    console.log('object>>', 'width', 'height', 'angle', 'left', 'top', 'scaleX', 'scaleY', 'zoomX', 'zoomY' );
-    console.log('object>>', object.width, object.height, object.angle, object.left, object.top, object.scaleX, object.scaleY, object.zoomX, object.zoomY );
-    console.log('rect>>', rect.width, rect.height, rect.angle, rect.left, rect.top, rect.scaleX, rect.scaleY, rect.zoomX, rect.zoomY );
+    // step 3 - apply inverted mask 
 
-    // phase 2 - apply inverted mask 
-    // create a clone of object and transform like a mask inverted
-    const clipOfObject = clone( object );
+    var clipOfObject = clone( object );
     rect.clipPath = clipOfObject;
     rect.clipPath.set({
+      typeName: 'ClipPath',
       inverted: true, 
       left: ( rect.clipPath.width / 2 ) * -1,
       top: ( rect.clipPath.height / 2 ) * -1,
     });
   
-    // phase 3 - apply another mask to maker inner shadow
-    const clipOfObjectFinal = clone( object );
+    // step 4 - apply another mask to maker inner shadow
+
+    var clipOfObjectFinal = clone( object );
     const clipFinal = new fabric.Group([rect]);
+    clipFinal.typeName = 'GroupShadow';
     clipFinal.clipPath = clipOfObjectFinal;
     clipFinal.clipPath.set({
+      typeName: 'ClipPath',
       left: ( rect.clipPath.width / 2 ) * -1,
       top: ( rect.clipPath.height / 2 ) * -1,
     });
 
-    console.log('clipFinal>>', clipFinal.width, clipFinal.height, clipFinal.angle, clipFinal.left, clipFinal.top, clipFinal.scaleX, clipFinal.scaleY, clipFinal.zoomX, clipFinal.zoomY );
-
-    // add all on canvas
     canvas.add(clipFinal);
-    canvas.bringToFront(clipFinal);
-    canvas.renderAll();
 
-    // -----------------------------------------------------------------------------
-    // set old transform
-    setTransform( canvas, [object,clipFinal], valuesTransform );
-    // // set old angle
-    setAngle( canvas, [object,clipFinal], angle, 1 );
-    // -----------------------------------------------------------------------------
+    if( scaleX != 1 || scaleY != 1 ){
+      [object,clipFinal].map( (el) => {
+        el.set({
+          scaleX: scaleX,
+          scaleY: scaleY,
+        });
+      });
+    }
+    setAngle( [object,clipFinal], angle, 1 );
 
-    // render
+    // render all
     canvas.renderAll();
 
   }
+
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
+  // -------------------------------------------------------------------------------------------------
 
   // https://jsfiddle.net/jrekw5og/141/
   // https://stackoverflow.com/questions/37378088/inset-shadow-on-html5-canvas-image/37380488#37380488
@@ -324,10 +402,11 @@
   }
 
   document.getElementById('addObjectRect').addEventListener("click", addObjectRect);
+  document.getElementById('addObjectEllipse').addEventListener("click", addObjectEllipse);
   document.getElementById('addObjectCircle').addEventListener("click", addObjectCircle);
   document.getElementById('addObjectPath').addEventListener("click", addObjectPath);
   document.getElementById('createObjectInnerShadow').addEventListener("click", createObjectInnerShadow);
   document.getElementById('createObjectInnerShadow2').addEventListener("click", createObjectInnerShadow2);
   document.getElementById('createObjectInnerShadow3').addEventListener("click", createObjectInnerShadow3);
 
-})()
+})();
