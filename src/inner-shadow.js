@@ -175,9 +175,9 @@
     // step 1
 
     const { angle, scaleX, scaleY } = object;
-    // set to angle = 0
+    // set to angle = 0 (reset)
     setAngle( [object], angle, -1 );
-    // set to scale 1
+    // set to scale 1 (reset)
     if( scaleX != 1 || scaleY != 1 ){
       offset = 0;        
       object.set({
@@ -203,7 +203,6 @@
         offsetY: 0,
       },
     });
-    rect.setCoords();
 
     // step 3 - apply inverted mask 
 
@@ -228,8 +227,10 @@
       top: ( rect.clipPath.height / 2 ) * -1,
     });
 
+    // add
     canvas.add(clipFinal);
 
+    // set back scale
     if( scaleX != 1 || scaleY != 1 ){
       [object,clipFinal].map( (el) => {
         el.set({
@@ -238,6 +239,7 @@
         });
       });
     }
+    // set back angle
     setAngle( [object,clipFinal], angle, 1 );
 
     // render all

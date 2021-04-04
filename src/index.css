@@ -14,11 +14,11 @@ html,body {
 }
 #panel button {
   padding: 10px 15px;
-  margin: 0;
+  margin: 0px;
   border: 1px solid #aaa;
 }
 #panel button.btn-inner-shadow {
-    background-color: blue;
+  background-color: blue;
   color: white;
 }
 #outside {
