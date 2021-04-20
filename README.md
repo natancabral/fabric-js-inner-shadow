@@ -1,6 +1,6 @@
 # Fabric.js inner shadow
 
-* not finished yet 
+* Working...
 
 ## Sample
 <img src="src/sample-1.png">
